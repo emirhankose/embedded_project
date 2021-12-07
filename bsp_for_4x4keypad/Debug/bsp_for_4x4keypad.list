@@ -1,0 +1,803 @@
+
+bsp_for_4x4keypad.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .isr_vector   000000bc  08000000  08000000  00010000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .text         0000049c  080000bc  080000bc  000100bc  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .rodata       00000000  08000558  08000560  00010560  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .init_array   00000004  08000558  08000558  00010558  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  4 .fini_array   00000004  0800055c  0800055c  0001055c  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  5 .data         00000000  20000000  20000000  00010560  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  6 .bss          0000001c  20000000  08000560  00020000  2**2
+                  ALLOC
+  7 ._user_heap_stack 00000604  2000001c  08000560  0002001c  2**0
+                  ALLOC
+  8 .ARM.attributes 00000028  00000000  00000000  00010560  2**0
+                  CONTENTS, READONLY
+  9 .debug_info   00000828  00000000  00000000  00010588  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 10 .debug_abbrev 000002ba  00000000  00000000  00010db0  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 11 .debug_aranges 00000090  00000000  00000000  00011070  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 12 .debug_ranges 00000058  00000000  00000000  00011100  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 13 .debug_line   0000082e  00000000  00000000  00011158  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 14 .debug_str    00000474  00000000  00000000  00011986  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 15 .comment      00000053  00000000  00000000  00011dfa  2**0
+                  CONTENTS, READONLY
+ 16 .debug_frame  000000d0  00000000  00000000  00011e50  2**2
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+
+Disassembly of section .text:
+
+080000bc <__do_global_dtors_aux>:
+ 80000bc:	b510      	push	{r4, lr}
+ 80000be:	4c06      	ldr	r4, [pc, #24]	; (80000d8 <__do_global_dtors_aux+0x1c>)
+ 80000c0:	7823      	ldrb	r3, [r4, #0]
+ 80000c2:	2b00      	cmp	r3, #0
+ 80000c4:	d107      	bne.n	80000d6 <__do_global_dtors_aux+0x1a>
+ 80000c6:	4b05      	ldr	r3, [pc, #20]	; (80000dc <__do_global_dtors_aux+0x20>)
+ 80000c8:	2b00      	cmp	r3, #0
+ 80000ca:	d002      	beq.n	80000d2 <__do_global_dtors_aux+0x16>
+ 80000cc:	4804      	ldr	r0, [pc, #16]	; (80000e0 <__do_global_dtors_aux+0x24>)
+ 80000ce:	e000      	b.n	80000d2 <__do_global_dtors_aux+0x16>
+ 80000d0:	bf00      	nop
+ 80000d2:	2301      	movs	r3, #1
+ 80000d4:	7023      	strb	r3, [r4, #0]
+ 80000d6:	bd10      	pop	{r4, pc}
+ 80000d8:	20000000 	.word	0x20000000
+ 80000dc:	00000000 	.word	0x00000000
+ 80000e0:	08000540 	.word	0x08000540
+
+080000e4 <frame_dummy>:
+ 80000e4:	4b04      	ldr	r3, [pc, #16]	; (80000f8 <frame_dummy+0x14>)
+ 80000e6:	b510      	push	{r4, lr}
+ 80000e8:	2b00      	cmp	r3, #0
+ 80000ea:	d003      	beq.n	80000f4 <frame_dummy+0x10>
+ 80000ec:	4903      	ldr	r1, [pc, #12]	; (80000fc <frame_dummy+0x18>)
+ 80000ee:	4804      	ldr	r0, [pc, #16]	; (8000100 <frame_dummy+0x1c>)
+ 80000f0:	e000      	b.n	80000f4 <frame_dummy+0x10>
+ 80000f2:	bf00      	nop
+ 80000f4:	bd10      	pop	{r4, pc}
+ 80000f6:	46c0      	nop			; (mov r8, r8)
+ 80000f8:	00000000 	.word	0x00000000
+ 80000fc:	20000004 	.word	0x20000004
+ 8000100:	08000540 	.word	0x08000540
+
+08000104 <setKeypad>:
+#include "keypad.h"
+
+#include"stm32g0xx.h"
+
+
+void setKeypad(char R1, int port_no){
+ 8000104:	b580      	push	{r7, lr}
+ 8000106:	b082      	sub	sp, #8
+ 8000108:	af00      	add	r7, sp, #0
+ 800010a:	0002      	movs	r2, r0
+ 800010c:	6039      	str	r1, [r7, #0]
+ 800010e:	1dfb      	adds	r3, r7, #7
+ 8000110:	701a      	strb	r2, [r3, #0]
+
+	if(R1=='A' && port_no==7){
+ 8000112:	1dfb      	adds	r3, r7, #7
+ 8000114:	781b      	ldrb	r3, [r3, #0]
+ 8000116:	2b41      	cmp	r3, #65	; 0x41
+ 8000118:	d13a      	bne.n	8000190 <setKeypad+0x8c>
+ 800011a:	683b      	ldr	r3, [r7, #0]
+ 800011c:	2b07      	cmp	r3, #7
+ 800011e:	d137      	bne.n	8000190 <setKeypad+0x8c>
+		RCC->IOPENR |=(1U<<0);
+ 8000120:	4bcc      	ldr	r3, [pc, #816]	; (8000454 <setKeypad+0x350>)
+ 8000122:	6b5a      	ldr	r2, [r3, #52]	; 0x34
+ 8000124:	4bcb      	ldr	r3, [pc, #812]	; (8000454 <setKeypad+0x350>)
+ 8000126:	2101      	movs	r1, #1
+ 8000128:	430a      	orrs	r2, r1
+ 800012a:	635a      	str	r2, [r3, #52]	; 0x34
+
+		GPIOA->MODER &=~(15U<<0);
+ 800012c:	23a0      	movs	r3, #160	; 0xa0
+ 800012e:	05db      	lsls	r3, r3, #23
+ 8000130:	681a      	ldr	r2, [r3, #0]
+ 8000132:	23a0      	movs	r3, #160	; 0xa0
+ 8000134:	05db      	lsls	r3, r3, #23
+ 8000136:	210f      	movs	r1, #15
+ 8000138:	438a      	bics	r2, r1
+ 800013a:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER |=(5U<<0);
+ 800013c:	23a0      	movs	r3, #160	; 0xa0
+ 800013e:	05db      	lsls	r3, r3, #23
+ 8000140:	681a      	ldr	r2, [r3, #0]
+ 8000142:	23a0      	movs	r3, #160	; 0xa0
+ 8000144:	05db      	lsls	r3, r3, #23
+ 8000146:	2105      	movs	r1, #5
+ 8000148:	430a      	orrs	r2, r1
+ 800014a:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER &=~(15U<<2*4);
+ 800014c:	23a0      	movs	r3, #160	; 0xa0
+ 800014e:	05db      	lsls	r3, r3, #23
+ 8000150:	681a      	ldr	r2, [r3, #0]
+ 8000152:	23a0      	movs	r3, #160	; 0xa0
+ 8000154:	05db      	lsls	r3, r3, #23
+ 8000156:	49c0      	ldr	r1, [pc, #768]	; (8000458 <setKeypad+0x354>)
+ 8000158:	400a      	ands	r2, r1
+ 800015a:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER |=(5U<<2*4);
+ 800015c:	23a0      	movs	r3, #160	; 0xa0
+ 800015e:	05db      	lsls	r3, r3, #23
+ 8000160:	681a      	ldr	r2, [r3, #0]
+ 8000162:	23a0      	movs	r3, #160	; 0xa0
+ 8000164:	05db      	lsls	r3, r3, #23
+ 8000166:	21a0      	movs	r1, #160	; 0xa0
+ 8000168:	00c9      	lsls	r1, r1, #3
+ 800016a:	430a      	orrs	r2, r1
+ 800016c:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER &=~(15U<<2*6);
+ 800016e:	23a0      	movs	r3, #160	; 0xa0
+ 8000170:	05db      	lsls	r3, r3, #23
+ 8000172:	681a      	ldr	r2, [r3, #0]
+ 8000174:	23a0      	movs	r3, #160	; 0xa0
+ 8000176:	05db      	lsls	r3, r3, #23
+ 8000178:	49b8      	ldr	r1, [pc, #736]	; (800045c <setKeypad+0x358>)
+ 800017a:	400a      	ands	r2, r1
+ 800017c:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER &=~(15U<<2*11);
+ 800017e:	23a0      	movs	r3, #160	; 0xa0
+ 8000180:	05db      	lsls	r3, r3, #23
+ 8000182:	681a      	ldr	r2, [r3, #0]
+ 8000184:	23a0      	movs	r3, #160	; 0xa0
+ 8000186:	05db      	lsls	r3, r3, #23
+ 8000188:	49b5      	ldr	r1, [pc, #724]	; (8000460 <setKeypad+0x35c>)
+ 800018a:	400a      	ands	r2, r1
+ 800018c:	601a      	str	r2, [r3, #0]
+ 800018e:	e15c      	b.n	800044a <setKeypad+0x346>
+
+
+	}
+	else if(R1=='A' && port_no==0){
+ 8000190:	1dfb      	adds	r3, r7, #7
+ 8000192:	781b      	ldrb	r3, [r3, #0]
+ 8000194:	2b41      	cmp	r3, #65	; 0x41
+ 8000196:	d13b      	bne.n	8000210 <setKeypad+0x10c>
+ 8000198:	683b      	ldr	r3, [r7, #0]
+ 800019a:	2b00      	cmp	r3, #0
+ 800019c:	d138      	bne.n	8000210 <setKeypad+0x10c>
+		RCC->IOPENR |=(1U<<0);
+ 800019e:	4bad      	ldr	r3, [pc, #692]	; (8000454 <setKeypad+0x350>)
+ 80001a0:	6b5a      	ldr	r2, [r3, #52]	; 0x34
+ 80001a2:	4bac      	ldr	r3, [pc, #688]	; (8000454 <setKeypad+0x350>)
+ 80001a4:	2101      	movs	r1, #1
+ 80001a6:	430a      	orrs	r2, r1
+ 80001a8:	635a      	str	r2, [r3, #52]	; 0x34
+		GPIOA->MODER &=~(15U<<0);
+ 80001aa:	23a0      	movs	r3, #160	; 0xa0
+ 80001ac:	05db      	lsls	r3, r3, #23
+ 80001ae:	681a      	ldr	r2, [r3, #0]
+ 80001b0:	23a0      	movs	r3, #160	; 0xa0
+ 80001b2:	05db      	lsls	r3, r3, #23
+ 80001b4:	210f      	movs	r1, #15
+ 80001b6:	438a      	bics	r2, r1
+ 80001b8:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER &=~(15U<<2*4);
+ 80001ba:	23a0      	movs	r3, #160	; 0xa0
+ 80001bc:	05db      	lsls	r3, r3, #23
+ 80001be:	681a      	ldr	r2, [r3, #0]
+ 80001c0:	23a0      	movs	r3, #160	; 0xa0
+ 80001c2:	05db      	lsls	r3, r3, #23
+ 80001c4:	49a4      	ldr	r1, [pc, #656]	; (8000458 <setKeypad+0x354>)
+ 80001c6:	400a      	ands	r2, r1
+ 80001c8:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER &=~(15U<<2*6);
+ 80001ca:	23a0      	movs	r3, #160	; 0xa0
+ 80001cc:	05db      	lsls	r3, r3, #23
+ 80001ce:	681a      	ldr	r2, [r3, #0]
+ 80001d0:	23a0      	movs	r3, #160	; 0xa0
+ 80001d2:	05db      	lsls	r3, r3, #23
+ 80001d4:	49a1      	ldr	r1, [pc, #644]	; (800045c <setKeypad+0x358>)
+ 80001d6:	400a      	ands	r2, r1
+ 80001d8:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER |=(5U<<2*6);
+ 80001da:	23a0      	movs	r3, #160	; 0xa0
+ 80001dc:	05db      	lsls	r3, r3, #23
+ 80001de:	681a      	ldr	r2, [r3, #0]
+ 80001e0:	23a0      	movs	r3, #160	; 0xa0
+ 80001e2:	05db      	lsls	r3, r3, #23
+ 80001e4:	21a0      	movs	r1, #160	; 0xa0
+ 80001e6:	01c9      	lsls	r1, r1, #7
+ 80001e8:	430a      	orrs	r2, r1
+ 80001ea:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER &=~(15U<<2*11);
+ 80001ec:	23a0      	movs	r3, #160	; 0xa0
+ 80001ee:	05db      	lsls	r3, r3, #23
+ 80001f0:	681a      	ldr	r2, [r3, #0]
+ 80001f2:	23a0      	movs	r3, #160	; 0xa0
+ 80001f4:	05db      	lsls	r3, r3, #23
+ 80001f6:	499a      	ldr	r1, [pc, #616]	; (8000460 <setKeypad+0x35c>)
+ 80001f8:	400a      	ands	r2, r1
+ 80001fa:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER |=(5U<<2*11);
+ 80001fc:	23a0      	movs	r3, #160	; 0xa0
+ 80001fe:	05db      	lsls	r3, r3, #23
+ 8000200:	681a      	ldr	r2, [r3, #0]
+ 8000202:	23a0      	movs	r3, #160	; 0xa0
+ 8000204:	05db      	lsls	r3, r3, #23
+ 8000206:	21a0      	movs	r1, #160	; 0xa0
+ 8000208:	0449      	lsls	r1, r1, #17
+ 800020a:	430a      	orrs	r2, r1
+ 800020c:	601a      	str	r2, [r3, #0]
+ 800020e:	e11c      	b.n	800044a <setKeypad+0x346>
+	}
+	else if(R1=='D'&& port_no==12){
+ 8000210:	1dfb      	adds	r3, r7, #7
+ 8000212:	781b      	ldrb	r3, [r3, #0]
+ 8000214:	2b44      	cmp	r3, #68	; 0x44
+ 8000216:	d140      	bne.n	800029a <setKeypad+0x196>
+ 8000218:	683b      	ldr	r3, [r7, #0]
+ 800021a:	2b0c      	cmp	r3, #12
+ 800021c:	d13d      	bne.n	800029a <setKeypad+0x196>
+
+		RCC->IOPENR |=(3U<<0);
+ 800021e:	4b8d      	ldr	r3, [pc, #564]	; (8000454 <setKeypad+0x350>)
+ 8000220:	6b5a      	ldr	r2, [r3, #52]	; 0x34
+ 8000222:	4b8c      	ldr	r3, [pc, #560]	; (8000454 <setKeypad+0x350>)
+ 8000224:	2103      	movs	r1, #3
+ 8000226:	430a      	orrs	r2, r1
+ 8000228:	635a      	str	r2, [r3, #52]	; 0x34
+
+		GPIOB->MODER &=~(3U<<0);
+ 800022a:	4b8e      	ldr	r3, [pc, #568]	; (8000464 <setKeypad+0x360>)
+ 800022c:	681a      	ldr	r2, [r3, #0]
+ 800022e:	4b8d      	ldr	r3, [pc, #564]	; (8000464 <setKeypad+0x360>)
+ 8000230:	2103      	movs	r1, #3
+ 8000232:	438a      	bics	r2, r1
+ 8000234:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(3U<<2*2);
+ 8000236:	4b8b      	ldr	r3, [pc, #556]	; (8000464 <setKeypad+0x360>)
+ 8000238:	681a      	ldr	r2, [r3, #0]
+ 800023a:	4b8a      	ldr	r3, [pc, #552]	; (8000464 <setKeypad+0x360>)
+ 800023c:	2130      	movs	r1, #48	; 0x30
+ 800023e:	438a      	bics	r2, r1
+ 8000240:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(15U<<2*4);
+ 8000242:	4b88      	ldr	r3, [pc, #544]	; (8000464 <setKeypad+0x360>)
+ 8000244:	681a      	ldr	r2, [r3, #0]
+ 8000246:	4b87      	ldr	r3, [pc, #540]	; (8000464 <setKeypad+0x360>)
+ 8000248:	4983      	ldr	r1, [pc, #524]	; (8000458 <setKeypad+0x354>)
+ 800024a:	400a      	ands	r2, r1
+ 800024c:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER |=(5U<<2*4);
+ 800024e:	4b85      	ldr	r3, [pc, #532]	; (8000464 <setKeypad+0x360>)
+ 8000250:	681a      	ldr	r2, [r3, #0]
+ 8000252:	4b84      	ldr	r3, [pc, #528]	; (8000464 <setKeypad+0x360>)
+ 8000254:	21a0      	movs	r1, #160	; 0xa0
+ 8000256:	00c9      	lsls	r1, r1, #3
+ 8000258:	430a      	orrs	r2, r1
+ 800025a:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(15U<<2*8);
+ 800025c:	4b81      	ldr	r3, [pc, #516]	; (8000464 <setKeypad+0x360>)
+ 800025e:	681a      	ldr	r2, [r3, #0]
+ 8000260:	4b80      	ldr	r3, [pc, #512]	; (8000464 <setKeypad+0x360>)
+ 8000262:	4981      	ldr	r1, [pc, #516]	; (8000468 <setKeypad+0x364>)
+ 8000264:	400a      	ands	r2, r1
+ 8000266:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER |=(1U<<2*9);
+ 8000268:	4b7e      	ldr	r3, [pc, #504]	; (8000464 <setKeypad+0x360>)
+ 800026a:	681a      	ldr	r2, [r3, #0]
+ 800026c:	4b7d      	ldr	r3, [pc, #500]	; (8000464 <setKeypad+0x360>)
+ 800026e:	2180      	movs	r1, #128	; 0x80
+ 8000270:	02c9      	lsls	r1, r1, #11
+ 8000272:	430a      	orrs	r2, r1
+ 8000274:	601a      	str	r2, [r3, #0]
+
+		GPIOA->MODER &=~(15U<<2*8);
+ 8000276:	23a0      	movs	r3, #160	; 0xa0
+ 8000278:	05db      	lsls	r3, r3, #23
+ 800027a:	681a      	ldr	r2, [r3, #0]
+ 800027c:	23a0      	movs	r3, #160	; 0xa0
+ 800027e:	05db      	lsls	r3, r3, #23
+ 8000280:	4979      	ldr	r1, [pc, #484]	; (8000468 <setKeypad+0x364>)
+ 8000282:	400a      	ands	r2, r1
+ 8000284:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER |=(1U<<2*8);
+ 8000286:	23a0      	movs	r3, #160	; 0xa0
+ 8000288:	05db      	lsls	r3, r3, #23
+ 800028a:	681a      	ldr	r2, [r3, #0]
+ 800028c:	23a0      	movs	r3, #160	; 0xa0
+ 800028e:	05db      	lsls	r3, r3, #23
+ 8000290:	2180      	movs	r1, #128	; 0x80
+ 8000292:	0249      	lsls	r1, r1, #9
+ 8000294:	430a      	orrs	r2, r1
+ 8000296:	601a      	str	r2, [r3, #0]
+ 8000298:	e0d7      	b.n	800044a <setKeypad+0x346>
+	}
+	else if(R1=='D' && port_no==3){
+ 800029a:	1dfb      	adds	r3, r7, #7
+ 800029c:	781b      	ldrb	r3, [r3, #0]
+ 800029e:	2b44      	cmp	r3, #68	; 0x44
+ 80002a0:	d141      	bne.n	8000326 <setKeypad+0x222>
+ 80002a2:	683b      	ldr	r3, [r7, #0]
+ 80002a4:	2b03      	cmp	r3, #3
+ 80002a6:	d13e      	bne.n	8000326 <setKeypad+0x222>
+		RCC->IOPENR |=(3U<<0);
+ 80002a8:	4b6a      	ldr	r3, [pc, #424]	; (8000454 <setKeypad+0x350>)
+ 80002aa:	6b5a      	ldr	r2, [r3, #52]	; 0x34
+ 80002ac:	4b69      	ldr	r3, [pc, #420]	; (8000454 <setKeypad+0x350>)
+ 80002ae:	2103      	movs	r1, #3
+ 80002b0:	430a      	orrs	r2, r1
+ 80002b2:	635a      	str	r2, [r3, #52]	; 0x34
+
+		GPIOB->MODER &=~(15U<<0);
+ 80002b4:	4b6b      	ldr	r3, [pc, #428]	; (8000464 <setKeypad+0x360>)
+ 80002b6:	681a      	ldr	r2, [r3, #0]
+ 80002b8:	4b6a      	ldr	r3, [pc, #424]	; (8000464 <setKeypad+0x360>)
+ 80002ba:	210f      	movs	r1, #15
+ 80002bc:	438a      	bics	r2, r1
+ 80002be:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(3U<<2*2);
+ 80002c0:	4b68      	ldr	r3, [pc, #416]	; (8000464 <setKeypad+0x360>)
+ 80002c2:	681a      	ldr	r2, [r3, #0]
+ 80002c4:	4b67      	ldr	r3, [pc, #412]	; (8000464 <setKeypad+0x360>)
+ 80002c6:	2130      	movs	r1, #48	; 0x30
+ 80002c8:	438a      	bics	r2, r1
+ 80002ca:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER |=(1U<<2*2);
+ 80002cc:	4b65      	ldr	r3, [pc, #404]	; (8000464 <setKeypad+0x360>)
+ 80002ce:	681a      	ldr	r2, [r3, #0]
+ 80002d0:	4b64      	ldr	r3, [pc, #400]	; (8000464 <setKeypad+0x360>)
+ 80002d2:	2110      	movs	r1, #16
+ 80002d4:	430a      	orrs	r2, r1
+ 80002d6:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(15U<<2*8);
+ 80002d8:	4b62      	ldr	r3, [pc, #392]	; (8000464 <setKeypad+0x360>)
+ 80002da:	681a      	ldr	r2, [r3, #0]
+ 80002dc:	4b61      	ldr	r3, [pc, #388]	; (8000464 <setKeypad+0x360>)
+ 80002de:	4962      	ldr	r1, [pc, #392]	; (8000468 <setKeypad+0x364>)
+ 80002e0:	400a      	ands	r2, r1
+ 80002e2:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER |=(5U<<2*8);
+ 80002e4:	4b5f      	ldr	r3, [pc, #380]	; (8000464 <setKeypad+0x360>)
+ 80002e6:	681a      	ldr	r2, [r3, #0]
+ 80002e8:	4b5e      	ldr	r3, [pc, #376]	; (8000464 <setKeypad+0x360>)
+ 80002ea:	21a0      	movs	r1, #160	; 0xa0
+ 80002ec:	02c9      	lsls	r1, r1, #11
+ 80002ee:	430a      	orrs	r2, r1
+ 80002f0:	601a      	str	r2, [r3, #0]
+
+
+		GPIOA->MODER &=~(15U<<2*8);
+ 80002f2:	23a0      	movs	r3, #160	; 0xa0
+ 80002f4:	05db      	lsls	r3, r3, #23
+ 80002f6:	681a      	ldr	r2, [r3, #0]
+ 80002f8:	23a0      	movs	r3, #160	; 0xa0
+ 80002fa:	05db      	lsls	r3, r3, #23
+ 80002fc:	495a      	ldr	r1, [pc, #360]	; (8000468 <setKeypad+0x364>)
+ 80002fe:	400a      	ands	r2, r1
+ 8000300:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER |=(1U<<2*8);
+ 8000302:	23a0      	movs	r3, #160	; 0xa0
+ 8000304:	05db      	lsls	r3, r3, #23
+ 8000306:	681a      	ldr	r2, [r3, #0]
+ 8000308:	23a0      	movs	r3, #160	; 0xa0
+ 800030a:	05db      	lsls	r3, r3, #23
+ 800030c:	2180      	movs	r1, #128	; 0x80
+ 800030e:	0249      	lsls	r1, r1, #9
+ 8000310:	430a      	orrs	r2, r1
+ 8000312:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER &=~(3U<<2*10);
+ 8000314:	23a0      	movs	r3, #160	; 0xa0
+ 8000316:	05db      	lsls	r3, r3, #23
+ 8000318:	681a      	ldr	r2, [r3, #0]
+ 800031a:	23a0      	movs	r3, #160	; 0xa0
+ 800031c:	05db      	lsls	r3, r3, #23
+ 800031e:	4953      	ldr	r1, [pc, #332]	; (800046c <setKeypad+0x368>)
+ 8000320:	400a      	ands	r2, r1
+ 8000322:	601a      	str	r2, [r3, #0]
+ 8000324:	e091      	b.n	800044a <setKeypad+0x346>
+
+	}
+
+	else if(R1=='D' && port_no==4){
+ 8000326:	1dfb      	adds	r3, r7, #7
+ 8000328:	781b      	ldrb	r3, [r3, #0]
+ 800032a:	2b44      	cmp	r3, #68	; 0x44
+ 800032c:	d148      	bne.n	80003c0 <setKeypad+0x2bc>
+ 800032e:	683b      	ldr	r3, [r7, #0]
+ 8000330:	2b04      	cmp	r3, #4
+ 8000332:	d145      	bne.n	80003c0 <setKeypad+0x2bc>
+		RCC->IOPENR |=(3U<<0);
+ 8000334:	4b47      	ldr	r3, [pc, #284]	; (8000454 <setKeypad+0x350>)
+ 8000336:	6b5a      	ldr	r2, [r3, #52]	; 0x34
+ 8000338:	4b46      	ldr	r3, [pc, #280]	; (8000454 <setKeypad+0x350>)
+ 800033a:	2103      	movs	r1, #3
+ 800033c:	430a      	orrs	r2, r1
+ 800033e:	635a      	str	r2, [r3, #52]	; 0x34
+
+		GPIOB->MODER &=~(3U<<0);
+ 8000340:	4b48      	ldr	r3, [pc, #288]	; (8000464 <setKeypad+0x360>)
+ 8000342:	681a      	ldr	r2, [r3, #0]
+ 8000344:	4b47      	ldr	r3, [pc, #284]	; (8000464 <setKeypad+0x360>)
+ 8000346:	2103      	movs	r1, #3
+ 8000348:	438a      	bics	r2, r1
+ 800034a:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(3U<<2*2);
+ 800034c:	4b45      	ldr	r3, [pc, #276]	; (8000464 <setKeypad+0x360>)
+ 800034e:	681a      	ldr	r2, [r3, #0]
+ 8000350:	4b44      	ldr	r3, [pc, #272]	; (8000464 <setKeypad+0x360>)
+ 8000352:	2130      	movs	r1, #48	; 0x30
+ 8000354:	438a      	bics	r2, r1
+ 8000356:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(3U<<2*5);
+ 8000358:	4b42      	ldr	r3, [pc, #264]	; (8000464 <setKeypad+0x360>)
+ 800035a:	681a      	ldr	r2, [r3, #0]
+ 800035c:	4b41      	ldr	r3, [pc, #260]	; (8000464 <setKeypad+0x360>)
+ 800035e:	4944      	ldr	r1, [pc, #272]	; (8000470 <setKeypad+0x36c>)
+ 8000360:	400a      	ands	r2, r1
+ 8000362:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER |=(1U<<2*5);
+ 8000364:	4b3f      	ldr	r3, [pc, #252]	; (8000464 <setKeypad+0x360>)
+ 8000366:	681a      	ldr	r2, [r3, #0]
+ 8000368:	4b3e      	ldr	r3, [pc, #248]	; (8000464 <setKeypad+0x360>)
+ 800036a:	2180      	movs	r1, #128	; 0x80
+ 800036c:	00c9      	lsls	r1, r1, #3
+ 800036e:	430a      	orrs	r2, r1
+ 8000370:	601a      	str	r2, [r3, #0]
+
+		GPIOB->MODER &=~(15U<<2*8);
+ 8000372:	4b3c      	ldr	r3, [pc, #240]	; (8000464 <setKeypad+0x360>)
+ 8000374:	681a      	ldr	r2, [r3, #0]
+ 8000376:	4b3b      	ldr	r3, [pc, #236]	; (8000464 <setKeypad+0x360>)
+ 8000378:	493b      	ldr	r1, [pc, #236]	; (8000468 <setKeypad+0x364>)
+ 800037a:	400a      	ands	r2, r1
+ 800037c:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=(5U<<2*8);
+ 800037e:	4b39      	ldr	r3, [pc, #228]	; (8000464 <setKeypad+0x360>)
+ 8000380:	6819      	ldr	r1, [r3, #0]
+ 8000382:	4b38      	ldr	r3, [pc, #224]	; (8000464 <setKeypad+0x360>)
+ 8000384:	22a0      	movs	r2, #160	; 0xa0
+ 8000386:	02d2      	lsls	r2, r2, #11
+ 8000388:	400a      	ands	r2, r1
+ 800038a:	601a      	str	r2, [r3, #0]
+
+		GPIOA->MODER &=~(15U<<2*7);
+ 800038c:	23a0      	movs	r3, #160	; 0xa0
+ 800038e:	05db      	lsls	r3, r3, #23
+ 8000390:	681a      	ldr	r2, [r3, #0]
+ 8000392:	23a0      	movs	r3, #160	; 0xa0
+ 8000394:	05db      	lsls	r3, r3, #23
+ 8000396:	4937      	ldr	r1, [pc, #220]	; (8000474 <setKeypad+0x370>)
+ 8000398:	400a      	ands	r2, r1
+ 800039a:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER |=(1U<<2*7);
+ 800039c:	23a0      	movs	r3, #160	; 0xa0
+ 800039e:	05db      	lsls	r3, r3, #23
+ 80003a0:	681a      	ldr	r2, [r3, #0]
+ 80003a2:	23a0      	movs	r3, #160	; 0xa0
+ 80003a4:	05db      	lsls	r3, r3, #23
+ 80003a6:	2180      	movs	r1, #128	; 0x80
+ 80003a8:	01c9      	lsls	r1, r1, #7
+ 80003aa:	430a      	orrs	r2, r1
+ 80003ac:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER &=~(3U<<2*9);
+ 80003ae:	23a0      	movs	r3, #160	; 0xa0
+ 80003b0:	05db      	lsls	r3, r3, #23
+ 80003b2:	681a      	ldr	r2, [r3, #0]
+ 80003b4:	23a0      	movs	r3, #160	; 0xa0
+ 80003b6:	05db      	lsls	r3, r3, #23
+ 80003b8:	492f      	ldr	r1, [pc, #188]	; (8000478 <setKeypad+0x374>)
+ 80003ba:	400a      	ands	r2, r1
+ 80003bc:	601a      	str	r2, [r3, #0]
+ 80003be:	e044      	b.n	800044a <setKeypad+0x346>
+
+	}
+	else if(R1=='D' && port_no==5){
+ 80003c0:	1dfb      	adds	r3, r7, #7
+ 80003c2:	781b      	ldrb	r3, [r3, #0]
+ 80003c4:	2b44      	cmp	r3, #68	; 0x44
+ 80003c6:	d140      	bne.n	800044a <setKeypad+0x346>
+ 80003c8:	683b      	ldr	r3, [r7, #0]
+ 80003ca:	2b05      	cmp	r3, #5
+ 80003cc:	d13d      	bne.n	800044a <setKeypad+0x346>
+
+		RCC->IOPENR |=(3U<<0);
+ 80003ce:	4b21      	ldr	r3, [pc, #132]	; (8000454 <setKeypad+0x350>)
+ 80003d0:	6b5a      	ldr	r2, [r3, #52]	; 0x34
+ 80003d2:	4b20      	ldr	r3, [pc, #128]	; (8000454 <setKeypad+0x350>)
+ 80003d4:	2103      	movs	r1, #3
+ 80003d6:	430a      	orrs	r2, r1
+ 80003d8:	635a      	str	r2, [r3, #52]	; 0x34
+		GPIOB->MODER &=~(3U<<0);
+ 80003da:	4b22      	ldr	r3, [pc, #136]	; (8000464 <setKeypad+0x360>)
+ 80003dc:	681a      	ldr	r2, [r3, #0]
+ 80003de:	4b21      	ldr	r3, [pc, #132]	; (8000464 <setKeypad+0x360>)
+ 80003e0:	2103      	movs	r1, #3
+ 80003e2:	438a      	bics	r2, r1
+ 80003e4:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(3U<<2*2);
+ 80003e6:	4b1f      	ldr	r3, [pc, #124]	; (8000464 <setKeypad+0x360>)
+ 80003e8:	681a      	ldr	r2, [r3, #0]
+ 80003ea:	4b1e      	ldr	r3, [pc, #120]	; (8000464 <setKeypad+0x360>)
+ 80003ec:	2130      	movs	r1, #48	; 0x30
+ 80003ee:	438a      	bics	r2, r1
+ 80003f0:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(15U<<2*4);
+ 80003f2:	4b1c      	ldr	r3, [pc, #112]	; (8000464 <setKeypad+0x360>)
+ 80003f4:	681a      	ldr	r2, [r3, #0]
+ 80003f6:	4b1b      	ldr	r3, [pc, #108]	; (8000464 <setKeypad+0x360>)
+ 80003f8:	4917      	ldr	r1, [pc, #92]	; (8000458 <setKeypad+0x354>)
+ 80003fa:	400a      	ands	r2, r1
+ 80003fc:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER |=(5U<<2*4);
+ 80003fe:	4b19      	ldr	r3, [pc, #100]	; (8000464 <setKeypad+0x360>)
+ 8000400:	681a      	ldr	r2, [r3, #0]
+ 8000402:	4b18      	ldr	r3, [pc, #96]	; (8000464 <setKeypad+0x360>)
+ 8000404:	21a0      	movs	r1, #160	; 0xa0
+ 8000406:	00c9      	lsls	r1, r1, #3
+ 8000408:	430a      	orrs	r2, r1
+ 800040a:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER &=~(15U<<2*8);
+ 800040c:	4b15      	ldr	r3, [pc, #84]	; (8000464 <setKeypad+0x360>)
+ 800040e:	681a      	ldr	r2, [r3, #0]
+ 8000410:	4b14      	ldr	r3, [pc, #80]	; (8000464 <setKeypad+0x360>)
+ 8000412:	4915      	ldr	r1, [pc, #84]	; (8000468 <setKeypad+0x364>)
+ 8000414:	400a      	ands	r2, r1
+ 8000416:	601a      	str	r2, [r3, #0]
+		GPIOB->MODER |=(1U<<2*9);
+ 8000418:	4b12      	ldr	r3, [pc, #72]	; (8000464 <setKeypad+0x360>)
+ 800041a:	681a      	ldr	r2, [r3, #0]
+ 800041c:	4b11      	ldr	r3, [pc, #68]	; (8000464 <setKeypad+0x360>)
+ 800041e:	2180      	movs	r1, #128	; 0x80
+ 8000420:	02c9      	lsls	r1, r1, #11
+ 8000422:	430a      	orrs	r2, r1
+ 8000424:	601a      	str	r2, [r3, #0]
+
+		GPIOA->MODER &=~(15U<<2*8);
+ 8000426:	23a0      	movs	r3, #160	; 0xa0
+ 8000428:	05db      	lsls	r3, r3, #23
+ 800042a:	681a      	ldr	r2, [r3, #0]
+ 800042c:	23a0      	movs	r3, #160	; 0xa0
+ 800042e:	05db      	lsls	r3, r3, #23
+ 8000430:	490d      	ldr	r1, [pc, #52]	; (8000468 <setKeypad+0x364>)
+ 8000432:	400a      	ands	r2, r1
+ 8000434:	601a      	str	r2, [r3, #0]
+		GPIOA->MODER |=(1U<<2*8);
+ 8000436:	23a0      	movs	r3, #160	; 0xa0
+ 8000438:	05db      	lsls	r3, r3, #23
+ 800043a:	681a      	ldr	r2, [r3, #0]
+ 800043c:	23a0      	movs	r3, #160	; 0xa0
+ 800043e:	05db      	lsls	r3, r3, #23
+ 8000440:	2180      	movs	r1, #128	; 0x80
+ 8000442:	0249      	lsls	r1, r1, #9
+ 8000444:	430a      	orrs	r2, r1
+ 8000446:	601a      	str	r2, [r3, #0]
+	}
+
+}
+ 8000448:	e7ff      	b.n	800044a <setKeypad+0x346>
+ 800044a:	46c0      	nop			; (mov r8, r8)
+ 800044c:	46bd      	mov	sp, r7
+ 800044e:	b002      	add	sp, #8
+ 8000450:	bd80      	pop	{r7, pc}
+ 8000452:	46c0      	nop			; (mov r8, r8)
+ 8000454:	40021000 	.word	0x40021000
+ 8000458:	fffff0ff 	.word	0xfffff0ff
+ 800045c:	ffff0fff 	.word	0xffff0fff
+ 8000460:	fc3fffff 	.word	0xfc3fffff
+ 8000464:	50000400 	.word	0x50000400
+ 8000468:	fff0ffff 	.word	0xfff0ffff
+ 800046c:	ffcfffff 	.word	0xffcfffff
+ 8000470:	fffff3ff 	.word	0xfffff3ff
+ 8000474:	fffc3fff 	.word	0xfffc3fff
+ 8000478:	fff3ffff 	.word	0xfff3ffff
+
+0800047c <main>:
+#include "stm32g0xx.h"
+
+#include "keypad.h"
+
+
+int main(){
+ 800047c:	b510      	push	{r4, lr}
+
+
+setKeypad('D',3);
+ 800047e:	2044      	movs	r0, #68	; 0x44
+ 8000480:	2103      	movs	r1, #3
+ 8000482:	f7ff fe3f 	bl	8000104 <setKeypad>
+
+return 0;
+}
+ 8000486:	2000      	movs	r0, #0
+ 8000488:	bd10      	pop	{r4, pc}
+ 800048a:	46c0      	nop			; (mov r8, r8)
+
+0800048c <Reset_Handler>:
+
+  .section .text.Reset_Handler
+  .weak Reset_Handler
+  .type Reset_Handler, %function
+Reset_Handler:
+  ldr   r0, =_estack
+ 800048c:	480d      	ldr	r0, [pc, #52]	; (80004c4 <LoopForever+0x2>)
+  mov   sp, r0          /* set stack pointer */
+ 800048e:	4685      	mov	sp, r0
+/* Call the clock system intitialization function.*/
+  bl  SystemInit
+ 8000490:	f000 f826 	bl	80004e0 <SystemInit>
+
+/* Copy the data segment initializers from flash to SRAM */
+  ldr r0, =_sdata
+ 8000494:	480c      	ldr	r0, [pc, #48]	; (80004c8 <LoopForever+0x6>)
+  ldr r1, =_edata
+ 8000496:	490d      	ldr	r1, [pc, #52]	; (80004cc <LoopForever+0xa>)
+  ldr r2, =_sidata
+ 8000498:	4a0d      	ldr	r2, [pc, #52]	; (80004d0 <LoopForever+0xe>)
+  movs r3, #0
+ 800049a:	2300      	movs	r3, #0
+  b LoopCopyDataInit
+ 800049c:	e002      	b.n	80004a4 <LoopCopyDataInit>
+
+0800049e <CopyDataInit>:
+
+CopyDataInit:
+  ldr r4, [r2, r3]
+ 800049e:	58d4      	ldr	r4, [r2, r3]
+  str r4, [r0, r3]
+ 80004a0:	50c4      	str	r4, [r0, r3]
+  adds r3, r3, #4
+ 80004a2:	3304      	adds	r3, #4
+
+080004a4 <LoopCopyDataInit>:
+
+LoopCopyDataInit:
+  adds r4, r0, r3
+ 80004a4:	18c4      	adds	r4, r0, r3
+  cmp r4, r1
+ 80004a6:	428c      	cmp	r4, r1
+  bcc CopyDataInit
+ 80004a8:	d3f9      	bcc.n	800049e <CopyDataInit>
+
+/* Zero fill the bss segment. */
+  ldr r2, =_sbss
+ 80004aa:	4a0a      	ldr	r2, [pc, #40]	; (80004d4 <LoopForever+0x12>)
+  ldr r4, =_ebss
+ 80004ac:	4c0a      	ldr	r4, [pc, #40]	; (80004d8 <LoopForever+0x16>)
+  movs r3, #0
+ 80004ae:	2300      	movs	r3, #0
+  b LoopFillZerobss
+ 80004b0:	e001      	b.n	80004b6 <LoopFillZerobss>
+
+080004b2 <FillZerobss>:
+
+FillZerobss:
+  str  r3, [r2]
+ 80004b2:	6013      	str	r3, [r2, #0]
+  adds r2, r2, #4
+ 80004b4:	3204      	adds	r2, #4
+
+080004b6 <LoopFillZerobss>:
+
+LoopFillZerobss:
+  cmp r2, r4
+ 80004b6:	42a2      	cmp	r2, r4
+  bcc FillZerobss
+ 80004b8:	d3fb      	bcc.n	80004b2 <FillZerobss>
+
+/* Call static constructors */
+  bl __libc_init_array
+ 80004ba:	f000 f81d 	bl	80004f8 <__libc_init_array>
+/* Call the application's entry point.*/
+  bl main
+ 80004be:	f7ff ffdd 	bl	800047c <main>
+
+080004c2 <LoopForever>:
+
+LoopForever:
+    b LoopForever
+ 80004c2:	e7fe      	b.n	80004c2 <LoopForever>
+  ldr   r0, =_estack
+ 80004c4:	20002000 	.word	0x20002000
+  ldr r0, =_sdata
+ 80004c8:	20000000 	.word	0x20000000
+  ldr r1, =_edata
+ 80004cc:	20000000 	.word	0x20000000
+  ldr r2, =_sidata
+ 80004d0:	08000560 	.word	0x08000560
+  ldr r2, =_sbss
+ 80004d4:	20000000 	.word	0x20000000
+  ldr r4, =_ebss
+ 80004d8:	2000001c 	.word	0x2000001c
+
+080004dc <ADC_COMP_IRQHandler>:
+ * @retval : None
+*/
+  .section .text.Default_Handler,"ax",%progbits
+Default_Handler:
+Infinite_Loop:
+  b Infinite_Loop
+ 80004dc:	e7fe      	b.n	80004dc <ADC_COMP_IRQHandler>
+	...
+
+080004e0 <SystemInit>:
+  * @brief  Setup the microcontroller system.
+  * @param  None
+  * @retval None
+  */
+void SystemInit(void)
+{
+ 80004e0:	b580      	push	{r7, lr}
+ 80004e2:	af00      	add	r7, sp, #0
+  /* Configure the Vector Table location add offset address ------------------*/
+#ifdef VECT_TAB_SRAM
+  SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
+#else
+  SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH */
+ 80004e4:	4b03      	ldr	r3, [pc, #12]	; (80004f4 <SystemInit+0x14>)
+ 80004e6:	2280      	movs	r2, #128	; 0x80
+ 80004e8:	0512      	lsls	r2, r2, #20
+ 80004ea:	609a      	str	r2, [r3, #8]
+#endif
+}
+ 80004ec:	46c0      	nop			; (mov r8, r8)
+ 80004ee:	46bd      	mov	sp, r7
+ 80004f0:	bd80      	pop	{r7, pc}
+ 80004f2:	46c0      	nop			; (mov r8, r8)
+ 80004f4:	e000ed00 	.word	0xe000ed00
+
+080004f8 <__libc_init_array>:
+ 80004f8:	b570      	push	{r4, r5, r6, lr}
+ 80004fa:	2600      	movs	r6, #0
+ 80004fc:	4d0c      	ldr	r5, [pc, #48]	; (8000530 <__libc_init_array+0x38>)
+ 80004fe:	4c0d      	ldr	r4, [pc, #52]	; (8000534 <__libc_init_array+0x3c>)
+ 8000500:	1b64      	subs	r4, r4, r5
+ 8000502:	10a4      	asrs	r4, r4, #2
+ 8000504:	42a6      	cmp	r6, r4
+ 8000506:	d109      	bne.n	800051c <__libc_init_array+0x24>
+ 8000508:	2600      	movs	r6, #0
+ 800050a:	f000 f819 	bl	8000540 <_init>
+ 800050e:	4d0a      	ldr	r5, [pc, #40]	; (8000538 <__libc_init_array+0x40>)
+ 8000510:	4c0a      	ldr	r4, [pc, #40]	; (800053c <__libc_init_array+0x44>)
+ 8000512:	1b64      	subs	r4, r4, r5
+ 8000514:	10a4      	asrs	r4, r4, #2
+ 8000516:	42a6      	cmp	r6, r4
+ 8000518:	d105      	bne.n	8000526 <__libc_init_array+0x2e>
+ 800051a:	bd70      	pop	{r4, r5, r6, pc}
+ 800051c:	00b3      	lsls	r3, r6, #2
+ 800051e:	58eb      	ldr	r3, [r5, r3]
+ 8000520:	4798      	blx	r3
+ 8000522:	3601      	adds	r6, #1
+ 8000524:	e7ee      	b.n	8000504 <__libc_init_array+0xc>
+ 8000526:	00b3      	lsls	r3, r6, #2
+ 8000528:	58eb      	ldr	r3, [r5, r3]
+ 800052a:	4798      	blx	r3
+ 800052c:	3601      	adds	r6, #1
+ 800052e:	e7f2      	b.n	8000516 <__libc_init_array+0x1e>
+ 8000530:	08000558 	.word	0x08000558
+ 8000534:	08000558 	.word	0x08000558
+ 8000538:	08000558 	.word	0x08000558
+ 800053c:	0800055c 	.word	0x0800055c
+
+08000540 <_init>:
+ 8000540:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 8000542:	46c0      	nop			; (mov r8, r8)
+ 8000544:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 8000546:	bc08      	pop	{r3}
+ 8000548:	469e      	mov	lr, r3
+ 800054a:	4770      	bx	lr
+
+0800054c <_fini>:
+ 800054c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 800054e:	46c0      	nop			; (mov r8, r8)
+ 8000550:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 8000552:	bc08      	pop	{r3}
+ 8000554:	469e      	mov	lr, r3
+ 8000556:	4770      	bx	lr
